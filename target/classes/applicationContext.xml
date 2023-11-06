@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/task
+        https://www.springframework.org/schema/task/spring-task.xsd
+        http://www.springframework.org/schema/tx
+        https://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/mvc
+        https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--spring框架启用注解模式，是初始化时实例化service/controller等对象-->
+    <context:component-scan base-package="com.xiaoheyu"/>
+    <!--3、开启springMvc注解模式-->
+    <mvc:annotation-driven>
+        <!--4.2解决响应中的中文乱码问题-->
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!--未使用freemarker模板引擎,直接通过响应向客户端输出的时候该配置生效
+                            如通过ajax请求返回json字符串时该配置生效-->
+                        <value>text/html;charset=utf-8</value>
+                        <!--6、JSON序列化输出配置-->
+                        <value>application/json;charset=utf-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!--排除静态资源-->
+    <mvc:default-servlet-handler/>
+
+    <!--5、配置freemarker模板引擎-->
+    <!--指定加载freemarker脚本的类-->
+    <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+        <!--指定freemaker脚本的存放地址-->
+        <property name="templateLoaderPath" value="/WEB-INF/ftl"/>
+        <property name="freemarkerSettings" >
+            <props>
+                <!--指定freemarker本身默认读取ftl文件的编码方式-->
+                <prop key="defaultEncoding">UTF-8</prop>
+            </props>
+        </property>
+    </bean>
+    <!--指定解析数据的模板引擎类-->
+    <bean id="ViewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+        <!--Spring MVC加载freemarker产生html片段返回数据的时候使用-->
+        <property name="contentType" value="text/html;charset=utf-8"/>
+        <!--指定freemaker模板引擎的后缀名-->
+        <property name="suffix" value=".ftl"/>
+    </bean>
+
+    <!--mybatis整合步骤-->
+    <!--2、配置数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/imooc-reader?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai&amp;allowPublicKeyRetrieval=true"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Hiu0219"/>
+        <property name="initialSize" value="5"/>
+        <property name="maxActive" value="20"/>
+    </bean>
+
+    <!--SqlSessionFactoryBean用于根据配置信息创建SqlSessionFactory，不再需要我们自己编码创建-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations" value="classpath:mappers/*.xml"/>
+        <!--5、，mybatis-config.xml配置文件地址-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+    </bean>
+
+    <!--4、配置Mapper扫描器:扫描指定包下的所有mapper接口-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.xiaoheyu.reader.mapper"/>
+    </bean>
+
+    <!--声明式事务配置-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--启用声明式事务的注解模式-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+</beans>
