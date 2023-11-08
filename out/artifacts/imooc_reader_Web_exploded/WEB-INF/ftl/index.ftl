@@ -62,10 +62,7 @@
     </script>
 <script>
     $.fn.raty.defaults.path="./resources/raty/lib/images"/*设置星星图片的存放路径*/
-
-    //loadMore()加载更多数据
-    //isReset参数设置为true，代表从第一位开始查询，否则按nextPage查询后续页
-    function loadMore(isReset){//新增标志位对第一页进行加载
+    function loadMore(isRest){//新增标志位对第一页进行加载
         if(isRest==true){//如果是初始加载时，将nextPage的值设为1
             $("#nextPage").val(1);
         }
