@@ -66,14 +66,17 @@
     //loadMore()加载更多数据
     //isReset参数设置为true，代表从第一位开始查询，否则按nextPage查询后续页
     function loadMore(isReset){//新增标志位对第一页进行加载
-        if(isRest==true){//如果是初始加载时，将nextPage的值设为1
+        if(isReset==true){//如果是初始加载时，将nextPage的值设为1
+            $("#bookList").html("");//将原有的图书信息清空
             $("#nextPage").val(1);
         }
         //以下代码对于初始化和加载更多的情况都能使用
         var nextPage=$("#nextPage").val();/*获得下一页的值*/
+        var categoryId=$("#categoryId").val();//获取分类编号
+        var order=$("#order").val();//获取排序方式
         $.ajax({
             url:"/books",
-            data:{p:nextPage},/*传入的数据名称要和函数的一样*/
+            data:{categoryId:categoryId,order:order,p:nextPage},/*传入的数据名称要和函数的一样*/
             type:"get",
             dataType:"json",
             success:function (json){
@@ -129,8 +132,24 @@
     /*绑定加载更多按钮单击事件*/
     $(function (){
         document.getElementById("btnMore").onclick=function (){
-            loadMore();
+            loadMore(false);
         }
+        $(".category").click(function (){/*分类名*/
+            $(".category").removeClass("highlight");//移除所有category类的超链接高亮设置
+            $(".category").addClass("text-black-50");//将所有分类超链接的颜色设置为灰色
+            $(this).addClass("highlight");//将当前点击的对象设置为高亮显示
+            var categoryId=$(this).data("category");//对应于span标签中data-category中的category值
+            $("#categoryId").val(categoryId);//将这个值设置到对应的隐藏域中
+            loadMore(true);//每点击一个分类，都是从第一页开始查询
+        })
+        $(".order").click(function (){/*排序条件*/
+            $(".order").removeClass("highlight");//移除所有order类的超链接高亮设置
+            $(".order").addClass("text-black-50");//将所有排序超链接的颜色设置为灰色
+            $(this).addClass("highlight");//将当前点击的对象设置为高亮显示
+            var order=$(this).data("order");//提取当前span中的data-score数据
+            $("#order").val(order);
+            loadMore(true);
+        })
 
     })
 </script>

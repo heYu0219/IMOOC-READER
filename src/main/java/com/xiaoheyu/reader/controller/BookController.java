@@ -36,11 +36,11 @@ public class BookController {//实现URL与方法之间的绑定
      */
     @GetMapping("/books")
     @ResponseBody //使用Spring MVC对IPage对象实现JSON序列化输出
-    public IPage<Book> selectBook(Integer p){
+    public IPage<Book> selectBook(Long categoryId,String order,Integer p){
         if(p ==null){//容错处理，如果传来的页号为空，则默认查询第一页数据
             p =1;
         }
-        IPage<Book> pageObject=bookService.paging(p,10);//传入页号和固定每页显示十条数据
+        IPage<Book> pageObject=bookService.paging(categoryId,order,p,10);//传入页号和固定每页显示十条数据
         return pageObject;
     }
 }
