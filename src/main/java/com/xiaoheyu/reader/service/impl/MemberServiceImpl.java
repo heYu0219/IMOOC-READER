@@ -1,8 +1,10 @@
 package com.xiaoheyu.reader.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.xiaoheyu.reader.entity.Evaluation;
 import com.xiaoheyu.reader.entity.Member;
 import com.xiaoheyu.reader.entity.MemberReadState;
+import com.xiaoheyu.reader.mapper.EvaluationMapper;
 import com.xiaoheyu.reader.mapper.MemberMapper;
 import com.xiaoheyu.reader.mapper.MemberReadStateMapper;
 import com.xiaoheyu.reader.service.MemberService;
@@ -11,6 +13,7 @@ import com.xiaoheyu.reader.utils.MD5Utils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -24,6 +27,8 @@ public class MemberServiceImpl implements MemberService {
     private MemberMapper memberMapper;
     @Resource
     private MemberReadStateMapper memberReadStateMapper;
+    @Resource
+    private EvaluationMapper evaluationMapper;
     @Override
     public Member createMember(String username, String password, String nickname) {
         QueryWrapper<Member> queryWrapper=new QueryWrapper<>();
@@ -97,5 +102,42 @@ public class MemberServiceImpl implements MemberService {
             memberReadStateMapper.updateById(memberReadState);
         }
         return memberReadState;
+    }
+
+    /**
+     * 发布新的短评
+     *
+     * @param memberId 会员编号
+     * @param bookId   图书编号
+     * @param score    评分
+     * @param content  短评内容
+     * @return 短评对象
+     */
+    @Override
+    public Evaluation evaluate(Long memberId, Long bookId, Integer score, String content) {
+        Evaluation evaluation=new Evaluation();
+        evaluation.setMemberId(memberId);
+        evaluation.setBookId(bookId);
+        evaluation.setScore(score);
+        evaluation.setContent(content);
+        evaluation.setState("enable");
+        evaluation.setEnjoy(0);
+        evaluation.setCreateTime(new Date());
+        evaluationMapper.insert(evaluation);
+        return evaluation;
+    }
+
+    /**
+     * 短评点赞
+     *
+     * @param evaluationId 短评编号
+     * @return 短评对象
+     */
+    @Override
+    public Evaluation enjoy(Long evaluationId) {//对点赞数量自增加1
+        Evaluation evaluation=evaluationMapper.selectById(evaluationId);
+        evaluation.setEnjoy(evaluation.getEnjoy()+1);
+        evaluationMapper.updateById(evaluation);
+        return evaluation;
     }
 }

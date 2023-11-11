@@ -17,12 +17,21 @@ public class Evaluation {
     private Long memberId;
     private Date createTime;
     private Integer enjoy;
+    private String state;
     private String disableReason;
     private Date disableTime;
     @TableField(exist = false)//说明book属性没有对应的字段，不会参与到sql自动生成
     private Book book;
     @TableField(exist = false)
     private Member member;
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
 
     public Book getBook() {
         return book;

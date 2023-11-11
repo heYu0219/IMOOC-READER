@@ -42,4 +42,13 @@ public class BookServiceImpl implements BookService {
     public Book selectById(Long bookId) {
         return bookMapper.selectById(bookId);
     }
+
+    @Override
+    /**
+     * 更新图书的评分
+     */
+    @Transactional
+    public void updateEvaluation() {
+        bookMapper.updateEvaluation();
+    }
 }

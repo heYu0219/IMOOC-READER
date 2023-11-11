@@ -80,6 +80,41 @@
                             }
                         },"json")
                 })
+            $("#btnEvaluation").click(function (){
+                //点击写短评的按钮弹出对话框
+                $("#score").raty({});//选中id=score的标签将其转换为星形组件
+                $("#dlgEvaluation").modal("show");//显示短评对话框
+            })
+            //评论对话框提交数据
+            $("#btnSubmit").click(function (){
+                var score=$("#score").raty("score");//获取评分
+                var content=$("#content").val();//获取短评内容
+                if (score==0 || $.trim(content)==""){//如果用户未评分或书写短评
+                    return;//直接终止
+                }else{
+                    $.post("/evaluate",{
+                        score:score,
+                        bookId:${book.bookId},
+                        memberId: ${loginMember.memberId},
+                        content:content
+                    },function (json){
+                        if (json.code=="0"){
+                            window.location.reload();//刷新当前页面
+                        }
+                    },"json")
+                }
+            })
+
+            $("*[data-evaluation-id]").click(function (){//为所有具有data-evaluation-id属性的按钮编写点击事件
+                var evaluationId=$(this).data("evaluation-id");//提取评论的Id
+                $.post("/enjoy",{evaluationId:evaluationId},function (json){
+                    if(json.code=="0"){
+                        //找到当前点击按钮下的span标签,将其中的内容填充为新的点赞数
+                        $("*[data-evaluation-id=']"+evaluationId+"'] span").text(json.evaluation.enjoy);
+                        // window.location.reload();//刷新当前页面
+                    }
+                },"json")
+            })
             </#if>
         })
     </script>
@@ -161,7 +196,7 @@
                             class="btn btn-success btn-sm text-white float-right" style="margin-top: -3px;">
                         <img style="width: 24px;margin-top: -5px;" class="mr-1"
                              src="https://img3.doubanio.com/f/talion/7a0756b3b6e67b59ea88653bc0cfa14f61ff219d/pics/card/ic_like_gray.svg"/>
-                        <span>${evaluation.enjoy}</span>
+                        <span id="enjoy_span">${evaluation.enjoy}</span>
                     </button>
                 </div>
 
@@ -198,7 +233,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <h6>为"从 0 开始学爬虫"写短评</h6>
+                <h6>为"${book.bookName}"写短评</h6>
                 <form id="frmEvaluation">
                     <div class="input-group  mt-2 ">
                         <span id="score"></span>
