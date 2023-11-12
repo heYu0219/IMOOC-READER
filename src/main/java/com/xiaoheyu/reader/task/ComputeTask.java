@@ -15,6 +15,5 @@ public class ComputeTask {
     @Scheduled(cron = "0 * * * * ?")//秒 分 时 日 月 星期(忽略)每分钟0秒时自动执行以下的定时任务
     public void updateEvaluation(){
         bookService.updateEvaluation();
-        System.out.println("已更新所有图书评分");
     }
 }

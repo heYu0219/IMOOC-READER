@@ -4,12 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiaoheyu.reader.entity.Book;
+import com.xiaoheyu.reader.entity.Evaluation;
+import com.xiaoheyu.reader.entity.MemberReadState;
 import com.xiaoheyu.reader.mapper.BookMapper;
+import com.xiaoheyu.reader.mapper.EvaluationMapper;
+import com.xiaoheyu.reader.mapper.MemberReadStateMapper;
 import com.xiaoheyu.reader.service.BookService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 
@@ -18,6 +23,10 @@ import javax.annotation.Resource;
 public class BookServiceImpl implements BookService {
     @Resource
     private BookMapper bookMapper;
+    @Resource
+    private EvaluationMapper evaluationMapper;
+    @Resource
+    private MemberReadStateMapper memberReadStateMapper;
     @Override
     //分页查询图书
     public IPage<Book> paging(Long categoryId,String order,Integer page, int rows) {
@@ -50,5 +59,47 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public void updateEvaluation() {
         bookMapper.updateEvaluation();
+    }
+
+    /**
+     * 创建新的图书
+     *
+     * @param book
+     */
+    @Override
+    @Transactional
+    public Book createBook(Book book) {
+        bookMapper.insert(book);
+        return book;//mybatis-plus会自动对图书编号进行回填
+    }
+
+    /**
+     * 更新图书
+     *
+     * @param book 新图书数据
+     * @return 更新后的图书数据
+     */
+    @Override
+    @Transactional
+    public Book updateBook(Book book) {
+        bookMapper.updateById(book);
+        return book;
+    }
+
+    /**
+     * 删除图书:包括评论 阅读状态 图书表
+     *
+     * @param bookId 图书编号
+     */
+    @Override
+    @Transactional
+    public void deleteBook(Long bookId) {
+        bookMapper.deleteById(bookId);
+        QueryWrapper<Evaluation> queryWrapper=new QueryWrapper<>();
+        queryWrapper.eq("book_id",bookId);
+        evaluationMapper.delete(queryWrapper);
+        QueryWrapper<MemberReadState> queryWrapper1=new QueryWrapper<>();
+        queryWrapper1.eq("book_id",bookId);
+        memberReadStateMapper.delete(queryWrapper1);
     }
 }
