@@ -1,13 +1,17 @@
 package com.xiaoheyu.reader.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiaoheyu.reader.entity.Book;
+import com.xiaoheyu.reader.entity.EBMDTO;
 import com.xiaoheyu.reader.entity.Evaluation;
 import com.xiaoheyu.reader.entity.Member;
 import com.xiaoheyu.reader.mapper.BookMapper;
 import com.xiaoheyu.reader.mapper.EvaluationMapper;
 import com.xiaoheyu.reader.mapper.MemberMapper;
 import com.xiaoheyu.reader.service.EvaluationService;
+import com.xiaoheyu.reader.utils.List2Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,4 +42,13 @@ public class EvaluationServiceImpl implements EvaluationService {
         }
         return evaluationList;
     }
+
+    @Override
+    public IPage<EBMDTO> getEvaluationPage(Integer page,Integer row) {
+        List<EBMDTO> ebmdtoList = evaluationMapper.selectEvaluationPage();
+        IPage pageObject = List2Page.listToPage(ebmdtoList, page, row);
+        return pageObject;
+    }
+
+
 }

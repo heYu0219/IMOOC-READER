@@ -111,7 +111,7 @@
                     if(json.code=="0"){
                         //找到当前点击按钮下的span标签,将其中的内容填充为新的点赞数
                         $("*[data-evaluation-id=']"+evaluationId+"'] span").text(json.evaluation.enjoy);
-                        // window.location.reload();//刷新当前页面
+                        window.location.reload();//刷新当前页面
                     }
                 },"json")
             })

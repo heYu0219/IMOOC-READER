@@ -3,4 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xiaoheyu.reader.mapper.EvaluationMapper">
+    <resultMap id="evaMap" type="com.xiaoheyu.reader.entity.EBMDTO">
+        <result property="createTime" column="create_time"/>
+        <result property="content" column="content"/>
+        <result property="bookName" column="book_name"/>
+        <result property="username" column="username"/>
+        <result property="state" column="state"/>
+        <result property="evaluationId" column="evaluation_id"/>
+    </resultMap>
+    <select id="selectEvaluationPage" resultMap="evaMap">
+        select e.evaluation_id,e.create_time,content,b.book_name,m.username ,e.state from evaluation e ,member m,book b
+        WHERE e.member_id=m.member_id and e.book_id=b.book_id
+    </select>
+
 </mapper>
